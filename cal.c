@@ -46,10 +46,10 @@ static const char   cal_fmt0[] = "It's %H:%M o'clock!";
 // Date format, by default 'Day. XX Month Year'
 static const char   cal_fmt1[] = "%a. %d %B %Y";
 
-static void cal_init(t_cal *cal)
+static void cal_init(t_cal *cal, time_t time, struct tm *local_time)
 {
-    time(&(cal->time));
-    cal->tm = localtime(&(cal->time));
+    cal->time = time;
+    cal->tm = local_time;
 }
 
 static void cal_str(t_cal *cal)
@@ -168,12 +168,20 @@ static void cal_calendar(t_cal *cal)
 
 static int cal(int argc, char *argv[])
 {
-    t_cal     cal;
+    t_cal cal;
+    time_t t;
+    struct tm local_time;
 
-    cal_init(&cal);
+    /* set time */
+    time(&t);
+    localtime_r(&t, &local_time);
+
+    /* show the calendar */
+    cal_init(&cal, t, &local_time);
     cal_str(&cal);
     cal_daytag(&cal);
     cal_calendar(&cal);
-    return (0);
+
+    return RT_EOK;
 }
 MSH_CMD_EXPORT(cal, calendar);
